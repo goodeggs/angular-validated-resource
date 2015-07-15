@@ -14,6 +14,8 @@ JSON Schema validation for angular resource.
 npm install angular-validated-resource
 ```
 
+Designed to be an (almost) drop-in replacement for angular resource. When you configure the resource actions, additionally pass a schema to `queryParamsSchema`, `requestBodySchema`, or `responseBodySchema` to automatically validate on every request.
+
 ```coffee
 angular.module 'Product', [
   require 'angular-validated-resource'
@@ -34,6 +36,8 @@ angular.module 'Product', [
       requestBodySchema: require './product_schemas/move/request_body.json' # JSON schema to use for validating
       responseBodySchema: require './product_schemas/move/response_body.json' # JSON schema to use for validating
 ```
+
+Note, if window.env is 'test', validation WILL NOT allow unknown fields. Otherwise, validation WILL allow unknown fields.
 
 ## Contributing
 
