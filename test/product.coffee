@@ -11,6 +11,11 @@ angular.module __filename, [
       isArray: true
       queryParamsSchema: require './product_schemas/query/query_params'
       responseBodySchema: require './product_schemas/query/response_body'
+    update:
+      method: 'PUT'
+      queryParamsSchema: require './product_schemas/update/query_params'
+      requestBodySchema: require './product_schemas/update/request_body'
+      responseBodySchema: require './product_schemas/update/response_body'
     move:
       method: 'POST'
       url: 'http://api.test.com/products/:_id/move'

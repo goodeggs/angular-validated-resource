@@ -8,6 +8,12 @@ angular.module 'validatedResource', [
 ]
 
 .factory 'validatedResource', ngInject ($resource, $window) ->
+
+  # remove all prototype properties to get raw response object
+  clean = (resource) ->
+    JSON.parse JSON.stringify resource
+
+
   getUrlParams = (url) ->
     regex = /\/:(\w*)/g
     matches = []
@@ -45,41 +51,39 @@ angular.module 'validatedResource', [
           Resource[actionName] = (params={}) ->
 
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
-            validate(queryParams, actionConfig.queryParamsSchema, 'Query validation failed')
+            validate(queryParams, actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
 
             resource = Resource["_#{actionName}"](params)
 
             resource.$promise.then (response) ->
-              cleanedResponse = JSON.parse(JSON.stringify(response)) # remove angular properties for validation
-              validate(response, actionConfig.responseBodySchema, 'Response body validation failed')
+              validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '#{actionName}'}")
 
             return resource
 
         else
           Resource[actionName] = (params={}, body) ->
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
-            validate(queryParams, actionConfig.queryParamsSchema, 'Query validation failed')
-            validate(body, actionConfig.requestBodySchema, 'Request body validation failed')
+            validate(queryParams, actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
+            # TODO: what if we dont get a required field b/c of $select?
+            validate(body, actionConfig.requestBodySchema, "Request body validation failed for action '#{actionName}'")
 
             resource = Resource["_#{actionName}"](params, body)
 
             resource.$promise.then (response) ->
-              cleanedResponse = JSON.parse(JSON.stringify(response)) # remove angular properties for validation
-              validate(cleanedResponse, actionConfig.responseBodySchema, 'Response body validation failed')
+              validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '#{actionName}'")
 
             return resource
 
-          Resource::[actionName] = (params={}) ->
+          Resource::["$#{actionName}"] = (params={}) ->
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
-            validate(queryParams, actionConfig.queryParamsSchema, 'Query validation failed')
-            validate(body, @, 'Request body validation failed')
+            validate(queryParams, actionConfig.queryParamsSchema, "Query validation failed for action '$#{actionName}'")
+            validate(clean(@), actionConfig.requestBodySchema, "Request body validation failed for action '$#{actionName}'")
 
-            resource = @["_#{actionName}"](params)
+            promise = @["$_#{actionName}"](params)
 
-            resource.$promise.then (response) ->
-              cleanedResponse = JSON.parse(JSON.stringify(response)) # remove angular properties for validation
-              validate(response, actionConfig.responseBodySchema, 'Response body validation failed')
+            promise.then (response) ->
+              validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '$#{actionName}'")
 
-            return resource
+            return @
 
     return Resource
