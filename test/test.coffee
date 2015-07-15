@@ -127,7 +127,7 @@ describe 'validatedResource', ->
           $httpBackend.flush()
         expect(fulfillRequest).to.throw 'Response body validation failed for action \'$update\': \'Unknown property (not in schema)\''
 
-      it 'succeeds if valid (for instance method)', inject (Product, $httpBackend) ->
+      it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6')
           .respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
         fulfillInstanceRequest = ->
