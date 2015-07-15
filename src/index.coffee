@@ -30,7 +30,9 @@ angular.module 'validatedResource', [
   validate = (obj, schema, errorPrefix) ->
     banUnknownProperties = true if $window.settings?.env is 'test'
     if schema? and not validator.validate(obj, schema, null, banUnknownProperties)
-      throw new Error "#{errorPrefix}: '#{validator.error.message}'"
+      message = "#{errorPrefix}: #{validator.error.message}"
+      message += " at #{validator.error.dataPath}" if validator.error.dataPath?.length
+      throw new Error message
 
   (url, paramDefaults, actions) ->
     privateActions = do ->

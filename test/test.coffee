@@ -14,12 +14,10 @@ describe 'validatedResource', ->
   describe 'validating queryParamsSchema', ->
     describe 'class method', ->
       it 'fails if param invalid', inject (Product) ->
-        # missing foodhubSlug
-        expect(-> Product.query({isActive: true})).to.throw /Query validation failed/
+        expect(-> Product.query({isActive: true})).to.throw 'Query validation failed for action \'query\': Missing required property: foodhubSlug'
 
       it 'fails if there is an extra param (for test env only)', inject (Product) ->
-        # state not a valid parameter
-        expect(-> Product.query({foodhubSlug: 'sfbay', state: 'lost'})).to.throw /Query validation failed/
+        expect(-> Product.query({foodhubSlug: 'sfbay', state: 'lost'})).to.throw 'Query validation failed for action \'query\': Unknown property (not in schema) at /state'
 
       it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectGET('http://api.test.com/products?foodhubSlug=sfbay&isActive=true')
@@ -32,10 +30,10 @@ describe 'validatedResource', ->
         @product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})
 
       it 'fails if param invalid', inject (Product) ->
-        expect(=> @product.$update({$select: true})).to.throw 'Query validation failed for action \'$update\': \'Invalid type: boolean (expected string)\''
+        expect(=> @product.$update({$select: true})).to.throw 'Query validation failed for action \'$update\': Invalid type: boolean (expected string) at /$select'
 
       it 'fails if there is an extra param (for test env only)', inject (Product) ->
-        expect(=> @product.$update({$select: 'name', deactivate: true})).to.throw 'Query validation failed for action \'$update\': \'Unknown property (not in schema)\''
+        expect(=> @product.$update({$select: 'name', deactivate: true})).to.throw 'Query validation failed for action \'$update\': Unknown property (not in schema) at /deactivate'
 
       it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6?$select=name')
@@ -46,12 +44,10 @@ describe 'validatedResource', ->
   describe 'validating requestBodySchema', ->
     describe 'class method', ->
       it 'fails if body invalid', inject (Product) ->
-        # invalid from type
-        expect(-> Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 27, to: 'backstock'})).to.throw /Request body validation failed/
+        expect(-> Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 27, to: 'backstock'})).to.throw 'Request body validation failed for action \'move\': Invalid type: number (expected string) at /from'
 
       it 'fails if there is an extra property (for test env only)', inject (Product) ->
-        # notify not expected
-        expect(-> Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock', notify: true})).to.throw /Request body validation failed/
+        expect(-> Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock', notify: true})).to.throw 'Request body validation failed for action \'move\': Unknown property (not in schema) at /notify'
 
       it 'succeeds if valid (for class method)', inject (Product, $httpBackend) ->
         $httpBackend.expectPOST('http://api.test.com/products/55a620bf8850c0bb45f323e6/move', {from: 'frontstock', to: 'backstock'})
@@ -62,11 +58,11 @@ describe 'validatedResource', ->
     describe 'instance method', ->
       it 'fails if param invalid', inject (Product) ->
         product = new Product({_id: '123', name: 'apple'})
-        expect(=> product.$update()).to.throw 'Request body validation failed for action \'$update\': \'Format validation failed (objectid expected)\''
+        expect(=> product.$update()).to.throw 'Request body validation failed for action \'$update\': Format validation failed (objectid expected) at /_id'
 
       it 'fails if there is an extra param (for test env only)', inject (Product) ->
         product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple', active: true})
-        expect(=> product.$update()).to.throw 'Request body validation failed for action \'$update\': \'Unknown property (not in schema)\''
+        expect(=> product.$update()).to.throw 'Request body validation failed for action \'$update\': Unknown property (not in schema) at /active'
 
       it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6')
@@ -83,7 +79,7 @@ describe 'validatedResource', ->
         fulfillRequest = ->
           Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock'})
           $httpBackend.flush()
-        expect(fulfillRequest).to.throw 'Response body validation failed for action \'move\': \'Missing required property: _id\''
+        expect(fulfillRequest).to.throw 'Response body validation failed for action \'move\': Missing required property: _id'
 
       it 'fails if there is an extra property (for test env only)', inject (Product, $httpBackend) ->
         $httpBackend.expectPOST('http://api.test.com/products/55a620bf8850c0bb45f323e6/move', {from: 'frontstock', to: 'backstock'})
@@ -96,7 +92,7 @@ describe 'validatedResource', ->
         fulfillRequest = ->
           Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock'})
           $httpBackend.flush()
-        expect(fulfillRequest).to.throw 'Response body validation failed for action \'move\': \'Unknown property (not in schema)\''
+        expect(fulfillRequest).to.throw 'Response body validation failed for action \'move\': Unknown property (not in schema) at /active'
 
       it 'succeeds if valid (for class method)', inject (Product, $httpBackend) ->
         $httpBackend.expectPOST('http://api.test.com/products/55a620bf8850c0bb45f323e6/move', {from: 'frontstock', to: 'backstock'})
@@ -116,7 +112,7 @@ describe 'validatedResource', ->
           product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})
           product.$update()
           $httpBackend.flush()
-        expect(fulfillRequest).to.throw 'Response body validation failed for action \'$update\': \'Missing required property: name\''
+        expect(fulfillRequest).to.throw 'Response body validation failed for action \'$update\': Missing required property: name'
 
       it 'fails if there is an extra property (for test env only)', inject (Product, $httpBackend) ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6')
@@ -125,7 +121,7 @@ describe 'validatedResource', ->
           product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})
           product.$update()
           $httpBackend.flush()
-        expect(fulfillRequest).to.throw 'Response body validation failed for action \'$update\': \'Unknown property (not in schema)\''
+        expect(fulfillRequest).to.throw 'Response body validation failed for action \'$update\': Unknown property (not in schema) at /active'
 
       it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6')
