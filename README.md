@@ -1,6 +1,6 @@
 # Angular Validated Resource
 
-JSON Schema validation for angular resource
+JSON Schema validation for angular resource.
 
 [![build status][travis-badge]][travis-link]
 [![npm version][npm-badge]][npm-link]
@@ -14,8 +14,25 @@ JSON Schema validation for angular resource
 npm install angular-validated-resource
 ```
 
-```js
-var angularValidatedResource = require('angular-validated-resource');
+```coffee
+angular.module 'Product', [
+  require 'angular-validated-resource'
+  # make sure you have angular-resource required somewhere too
+]
+
+.factory 'Product', ngInject (validatedResource) ->
+  validatedResource 'http://api.test.com/products/:_id', {_id: '@_id'},
+    query:
+      method: 'GET'
+      isArray: true
+      queryParamsSchema: require './product_schemas/query/query_params.json' # JSON schema to use for validating
+      responseBodySchema: require './product_schemas/query/response_body.json' # JSON schema to use for validating
+    move:
+      method: 'POST'
+      url: 'http://api.test.com/products/:_id/move'
+      params: {_id: '@_id'}
+      requestBodySchema: require './product_schemas/move/request_body.json' # JSON schema to use for validating
+      responseBodySchema: require './product_schemas/move/response_body.json' # JSON schema to use for validating
 ```
 
 ## Contributing
