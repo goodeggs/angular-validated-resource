@@ -10,7 +10,7 @@
   "keywords": [
     "angular resource validate validation schema json"
   ],
-  "main": "lib/index.js",
+  "main": "src/index.coffee",
   "repository": {
     "type": "git",
     "url": "git://github.com/goodeggs/angular-validated-resource.git"
@@ -33,9 +33,6 @@
     "mocha-sinon": "~1.x.x"
   },
   "scripts": {
-    "compile": "coffee --bare --compile --output lib/ src/",
-    "prepublish": "npm run compile",
-    "pretest": "npm run compile",
     "test": "gulp test"
   },
   "publishConfig": {
