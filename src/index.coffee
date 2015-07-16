@@ -86,6 +86,6 @@ angular.module 'validatedResource', [
             promise.then (response) ->
               validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '$#{actionName}'")
 
-            return @
+            return promise
 
     return Resource

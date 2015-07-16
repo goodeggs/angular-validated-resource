@@ -23,7 +23,7 @@ describe 'validatedResource', ->
         $httpBackend.expectGET('http://api.test.com/products?foodhubSlug=sfbay&isActive=true')
           .respond 200, [{_id: '55a620bf8850c0bb45f323e6', name: 'apple'}]
         # undefined fields should be stripped first...
-        expect(-> Product.query({foodhubSlug: 'sfbay', isActive: true, randomField: undefined})).not.to.throw()
+        expect(-> Product.query({foodhubSlug: 'sfbay', isActive: true, randomField: undefined}).$promise.then(->)).not.to.throw()
         $httpBackend.flush()
 
     describe 'instance method', ->
@@ -39,7 +39,8 @@ describe 'validatedResource', ->
       it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6?$select=name')
           .respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
-        expect(=> @product.$update({$select: 'name'})).not.to.throw()
+        # should still return a promise
+        expect(=> @product.$update({$select: 'name'}).then(->)).not.to.throw()
         $httpBackend.flush()
 
   describe 'validating requestBodySchema', ->
@@ -53,7 +54,7 @@ describe 'validatedResource', ->
       it 'succeeds if valid (for class method)', inject (Product, $httpBackend) ->
         $httpBackend.expectPOST('http://api.test.com/products/55a620bf8850c0bb45f323e6/move', {from: 'frontstock', to: 'backstock'})
           .respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
-        expect(-> Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock'})).not.to.throw()
+        expect(-> Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock'}).$promise.then(->)).not.to.throw()
         $httpBackend.flush()
 
     describe 'instance method', ->
@@ -69,7 +70,7 @@ describe 'validatedResource', ->
         $httpBackend.expectPUT('http://api.test.com/products/55a620bf8850c0bb45f323e6')
           .respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
         product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})
-        expect(=> product.$update()).not.to.throw()
+        expect(=> product.$update().then(->)).not.to.throw()
         $httpBackend.flush()
 
   describe 'validating responseBodySchema', ->
@@ -101,7 +102,7 @@ describe 'validatedResource', ->
             _id: '55a620bf8850c0bb45f323e6'
             name: 'cheese'
         fulfillRequest = ->
-          Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock'})
+          Product.move({_id: '55a620bf8850c0bb45f323e6'}, {from: 'frontstock', to: 'backstock'}).$promise.then(->)
           $httpBackend.flush()
         expect(fulfillRequest).not.to.throw()
 
@@ -129,6 +130,6 @@ describe 'validatedResource', ->
           .respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
         fulfillInstanceRequest = ->
           product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})
-          product.$update()
+          product.$update().then(->)
           $httpBackend.flush()
         expect(fulfillInstanceRequest).not.to.throw()
