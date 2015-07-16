@@ -50,12 +50,12 @@ angular.module 'validatedResource', [
         actionUrl = actionConfig.url or url
 
         if actionConfig.method is 'GET'
-          Resource[actionName] = (params={}) ->
+          Resource[actionName] = (params={}, success, error) ->
 
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
             validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
 
-            resource = Resource["_#{actionName}"](params)
+            resource = Resource["_#{actionName}"](params, success, error)
 
             resource.$promise.then (response) ->
               validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '#{actionName}'}")
@@ -63,25 +63,25 @@ angular.module 'validatedResource', [
             return resource
 
         else
-          Resource[actionName] = (params={}, body) ->
+          Resource[actionName] = (params={}, body, success, error) ->
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
             validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
             # TODO: what if we dont get a required field b/c of $select?
             validate(clean(body), actionConfig.requestBodySchema, "Request body validation failed for action '#{actionName}'")
 
-            resource = Resource["_#{actionName}"](params, body)
+            resource = Resource["_#{actionName}"](params, body, success, error)
 
             resource.$promise.then (response) ->
               validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '#{actionName}'")
 
             return resource
 
-          Resource::["$#{actionName}"] = (params={}) ->
+          Resource::["$#{actionName}"] = (params={}, success, error) ->
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
             validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '$#{actionName}'")
             validate(clean(@), actionConfig.requestBodySchema, "Request body validation failed for action '$#{actionName}'")
 
-            promise = @["$_#{actionName}"](params)
+            promise = @["$_#{actionName}"](params, success, error)
 
             promise.then (response) ->
               validate(clean(response), actionConfig.responseBodySchema, "Response body validation failed for action '$#{actionName}'")
