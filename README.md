@@ -19,7 +19,6 @@ Designed to be an (almost) drop-in replacement for angular resource. When you co
 ```coffee
 angular.module 'Product', [
   require 'angular-validated-resource'
-  # make sure you have angular-resource required somewhere too
 ]
 
 .factory 'Product', ngInject (validatedResource) ->
@@ -27,17 +26,20 @@ angular.module 'Product', [
     query:
       method: 'GET'
       isArray: true
-      queryParamsSchema: require './product_schemas/query/query_params.json' # JSON schema to use for validating
-      responseBodySchema: require './product_schemas/query/response_body.json' # JSON schema to use for validating
+      queryParamsSchema: require './product_schemas/query/query_params.json'
+      requestBodySchema: require './product_schemas/query/request_body.json'
+      responseBodySchema: require './product_schemas/query/response_body.json'
     move:
       method: 'POST'
       url: 'http://api.test.com/products/:_id/move'
-      params: {_id: '@_id'}
-      requestBodySchema: require './product_schemas/move/request_body.json' # JSON schema to use for validating
-      responseBodySchema: require './product_schemas/move/response_body.json' # JSON schema to use for validating
+      queryParamsSchema: require './product_schemas/move/query_params.json'
+      requestBodySchema: require './product_schemas/move/request_body.json'
+      responseBodySchema: require './product_schemas/move/response_body.json'
 ```
 
-Note, if window.env is 'test', validation WILL NOT allow unknown fields. Otherwise, validation WILL allow unknown fields.
+If window.env is 'test', validation **will not** allow unknown fields. Otherwise, validation **will** allow unknown fields.
+
+Although not required, we strongly recommended that you validate all parts of the request (queryParams, requestBody, and responseBody) for every action, even if the validation is just checking for an empty object. This way, you will catch any unexpected data that you pass through.
 
 ## Contributing
 
