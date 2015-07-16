@@ -22,7 +22,8 @@ describe 'validatedResource', ->
       it 'succeeds if valid', inject (Product, $httpBackend) ->
         $httpBackend.expectGET('http://api.test.com/products?foodhubSlug=sfbay&isActive=true')
           .respond 200, [{_id: '55a620bf8850c0bb45f323e6', name: 'apple'}]
-        expect(-> Product.query({foodhubSlug: 'sfbay', isActive: true})).not.to.throw()
+        # undefined fields should be stripped first...
+        expect(-> Product.query({foodhubSlug: 'sfbay', isActive: true, randomField: undefined})).not.to.throw()
         $httpBackend.flush()
 
     describe 'instance method', ->

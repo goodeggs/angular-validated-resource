@@ -9,7 +9,7 @@ angular.module 'validatedResource', [
 
 .factory 'validatedResource', ngInject ($resource, $window) ->
 
-  # remove all prototype properties to get raw response object
+  # remove all prototype properties, and undefined fields
   clean = (resource) ->
     JSON.parse JSON.stringify resource
 
@@ -53,7 +53,7 @@ angular.module 'validatedResource', [
           Resource[actionName] = (params={}) ->
 
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
-            validate(queryParams, actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
+            validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
 
             resource = Resource["_#{actionName}"](params)
 
@@ -65,9 +65,9 @@ angular.module 'validatedResource', [
         else
           Resource[actionName] = (params={}, body) ->
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
-            validate(queryParams, actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
+            validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
             # TODO: what if we dont get a required field b/c of $select?
-            validate(body, actionConfig.requestBodySchema, "Request body validation failed for action '#{actionName}'")
+            validate(clean(body), actionConfig.requestBodySchema, "Request body validation failed for action '#{actionName}'")
 
             resource = Resource["_#{actionName}"](params, body)
 
@@ -78,7 +78,7 @@ angular.module 'validatedResource', [
 
           Resource::["$#{actionName}"] = (params={}) ->
             queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
-            validate(queryParams, actionConfig.queryParamsSchema, "Query validation failed for action '$#{actionName}'")
+            validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '$#{actionName}'")
             validate(clean(@), actionConfig.requestBodySchema, "Request body validation failed for action '$#{actionName}'")
 
             promise = @["$_#{actionName}"](params)
