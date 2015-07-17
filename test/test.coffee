@@ -31,6 +31,11 @@ describe 'validatedResource', ->
         expect(-> Product.generate().$promise.then(->)).not.to.throw()
         $httpBackend.flush()
 
+      it 'does include @ url params if in body', inject (Product, $httpBackend) ->
+        $httpBackend.expectPOST('http://api.test.com/products/generate?name=apple').respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
+        expect(-> Product.generate({}, {name: 'apple'}).$promise.then(->)).not.to.throw()
+        $httpBackend.flush()
+
     describe 'instance method', ->
       beforeEach inject (Product) ->
         @product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})

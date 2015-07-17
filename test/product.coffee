@@ -27,6 +27,7 @@ angular.module __filename, [
     generate:
       method: 'POST'
       url: 'http://api.test.com/products/generate'
+      params: {name: '@name'}
       queryParamsSchema: require './product_schemas/generate/query_params'
       requestBodySchema: require './product_schemas/generate/request_body'
       responseBodySchema: require './product_schemas/generate/response_body'

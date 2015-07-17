@@ -25,9 +25,17 @@ angular.module 'validatedResource', [
   getQueryParams = (params, actionParams, paramDefaults, url, body) ->
     allParams = _.assign({}, paramDefaults, actionParams, params)
     paramsToOmit = []
+
+    # handle params with @ in value (e.g. {id: '@_id'})
     for param, value of allParams
-      if typeof value is 'string' and value.indexOf('@') is 0 and not body?[value.slice(1)]?
-        paramsToOmit.push(param)
+      if typeof value is 'string' and value.indexOf('@') is 0
+        # if @ value not in body, remove from query params
+        if not body?[value.slice(1)]?
+          paramsToOmit.push(param)
+        # if @ value in body, reassign in query params with actual value
+        else
+          allParams[param] = body?[value.slice(1)]
+
     paramsToOmit = paramsToOmit.concat(getUrlParams(url))
     _.omit(allParams, paramsToOmit)
 
