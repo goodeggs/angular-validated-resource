@@ -26,6 +26,11 @@ describe 'validatedResource', ->
         expect(-> Product.query({foodhubSlug: 'sfbay', isActive: true, randomField: undefined}).$promise.then(->)).not.to.throw()
         $httpBackend.flush()
 
+      it 'does not include @ url params if not in body', inject (Product, $httpBackend) ->
+        $httpBackend.expectPOST('http://api.test.com/products/generate').respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}
+        expect(-> Product.generate().$promise.then(->)).not.to.throw()
+        $httpBackend.flush()
+
     describe 'instance method', ->
       beforeEach inject (Product) ->
         @product = new Product({_id: '55a620bf8850c0bb45f323e6', name: 'apple'})

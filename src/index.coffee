@@ -13,7 +13,6 @@ angular.module 'validatedResource', [
   clean = (resource) ->
     JSON.parse JSON.stringify resource
 
-
   getUrlParams = (url) ->
     regex = /\/:(\w*)/g
     matches = []
@@ -23,9 +22,14 @@ angular.module 'validatedResource', [
       match = regex.exec(url)
     matches
 
-  getQueryParams = (params, actionParams, paramDefaults, url) ->
+  getQueryParams = (params, actionParams, paramDefaults, url, body) ->
     allParams = _.assign({}, paramDefaults, actionParams, params)
-    _.omit(allParams, getUrlParams(url))
+    paramsToOmit = []
+    for param, value of allParams
+      if typeof value is 'string' and value.indexOf('@') is 0 and not body?[value.slice(1)]?
+        paramsToOmit.push(param)
+    paramsToOmit = paramsToOmit.concat(getUrlParams(url))
+    _.omit(allParams, paramsToOmit)
 
   validate = (obj, schema, errorPrefix) ->
     banUnknownProperties = true if $window.settings?.env is 'test'
@@ -63,8 +67,8 @@ angular.module 'validatedResource', [
             return resource
 
         else
-          Resource[actionName] = (params={}, body, success, error) ->
-            queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl)
+          Resource[actionName] = (params={}, body={}, success, error) ->
+            queryParams = getQueryParams(params, actionConfig.params, paramDefaults, actionUrl, body)
             validate(clean(queryParams), actionConfig.queryParamsSchema, "Query validation failed for action '#{actionName}'")
             # TODO: what if we dont get a required field b/c of $select?
             validate(clean(body), actionConfig.requestBodySchema, "Request body validation failed for action '#{actionName}'")
