@@ -11,7 +11,9 @@ angular.module 'validatedResource', [
 
   # remove all prototype properties, and undefined fields
   clean = (resource) ->
-    JSON.parse JSON.stringify resource
+    # prefer angular toJson over JSON.stringify b/c it strips out properties like $$hashkey
+    # http://stackoverflow.com/questions/18826320/what-is-the-hashkey-added-to-my-json-stringify-result
+    JSON.parse angular.toJson resource
 
   getUrlParams = (url) ->
     regex = /\/:(\w*)/g
