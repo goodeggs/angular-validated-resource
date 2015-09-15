@@ -1,6 +1,6 @@
 {
   "name": "angular-validated-resource",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "JSON Schema validation for angular resource",
   "author": "Good Eggs <open-source@goodeggs.com>",
   "contributors": [
