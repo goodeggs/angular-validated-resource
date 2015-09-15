@@ -1,6 +1,6 @@
 module.exports =
   type: 'object'
-  required: ['foodhubSlug']
+  required: ['foodhubSlug', 'day']
   properties:
     foodhubSlug:
       type: 'string'
@@ -11,4 +11,8 @@ module.exports =
 
     name:
       type: 'string'
+
+    day:
+      type: 'string'
+      format: 'date'
 

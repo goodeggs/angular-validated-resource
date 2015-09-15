@@ -1,3 +1,4 @@
+geomoment = require 'geomoment'
 module.exports = __filename
 
 angular.module __filename, [
@@ -9,6 +10,8 @@ angular.module __filename, [
     query:
       method: 'GET'
       isArray: true
+      params:
+        day: -> geomoment().dayString()
       queryParamsSchema: require './product_schemas/query/query_params'
       requestBodySchema: require './product_schemas/query/request_body'
       responseBodySchema: require './product_schemas/query/response_body'
@@ -20,7 +23,8 @@ angular.module __filename, [
     move:
       method: 'POST'
       url: 'http://api.test.com/products/:_id/move'
-      params: {_id: '@_id'}
+      params:
+        _id: '@_id'
       queryParamsSchema: require './product_schemas/move/query_params'
       requestBodySchema: require './product_schemas/move/request_body'
       responseBodySchema: require './product_schemas/move/response_body'

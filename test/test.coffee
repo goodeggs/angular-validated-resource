@@ -1,5 +1,6 @@
 # TODO: fix attaching this to window here.
 window.ngInject = (arg) -> arg
+geomoment = require 'geomoment'
 require 'angular-resource'
 
 describe 'validatedResource', ->
@@ -20,11 +21,13 @@ describe 'validatedResource', ->
         expect(-> Product.query({foodhubSlug: 'sfbay', state: 'lost'})).to.throw 'Query validation failed for action \'query\': Unknown property (not in schema) at /state'
 
       it 'succeeds if valid', inject (Product, $httpBackend) ->
-        $httpBackend.expectGET('http://api.test.com/products?foodhubSlug=sfbay&isActive=true')
+        geomoment.stubTime '2015-11-11 09:00:00'
+        $httpBackend.expectGET('http://api.test.com/products?day=2015-11-11&foodhubSlug=sfbay&isActive=true')
           .respond 200, [{_id: '55a620bf8850c0bb45f323e6', name: 'apple'}]
         # undefined fields should be stripped first...
         expect(-> Product.query({foodhubSlug: 'sfbay', isActive: true, randomField: undefined}).$promise.then(->)).not.to.throw()
         $httpBackend.flush()
+        geomoment.restoreTime()
 
       it 'does not include @ url params if not in body', inject (Product, $httpBackend) ->
         $httpBackend.expectPOST('http://api.test.com/products/generate').respond 200, {_id: '55a620bf8850c0bb45f323e6', name: 'apple'}

@@ -37,6 +37,8 @@ angular.module 'validatedResource', [
         # if @ value in body, reassign in query params with actual value
         else
           allParams[param] = body?[value.slice(1)]
+      else if typeof value is 'function'
+        allParams[param] = value()
 
     paramsToOmit = paramsToOmit.concat(getUrlParams(url))
     _.omit(allParams, paramsToOmit)
