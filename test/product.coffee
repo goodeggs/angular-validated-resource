@@ -5,7 +5,7 @@ angular.module __filename, [
   require('../src')
 ]
 
-.factory 'Product', ngInject (validatedResource) ->
+.factory 'Product', ['validatedResource', (validatedResource) ->
   validatedResource 'http://api.test.com/products/:_id', {_id: '@_id'},
     query:
       method: 'GET'
@@ -35,4 +35,4 @@ angular.module __filename, [
       queryParamsSchema: require './product_schemas/generate/query_params'
       requestBodySchema: require './product_schemas/generate/request_body'
       responseBodySchema: require './product_schemas/generate/response_body'
-
+]

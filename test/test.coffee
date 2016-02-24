@@ -1,5 +1,4 @@
 # TODO: fix attaching this to window here.
-window.ngInject = (arg) -> arg
 geomoment = require 'geomoment'
 require 'angular-resource'
 
