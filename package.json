@@ -18,7 +18,7 @@
   "homepage": "https://github.com/goodeggs/angular-validated-resource",
   "bugs": "https://github.com/goodeggs/angular-validated-resource/issues",
   "dependencies": {
-    "goodeggs-json-schema-validator": "^2.0.2",
+    "goodeggs-json-schema-validator": "^3.3.0",
     "lodash": "^3.10.0"
   },
   "devDependencies": {
